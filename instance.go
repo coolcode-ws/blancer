@@ -28,5 +28,5 @@ func (i *Instance) GetCallTimes() string {
 }
 
 func (i *Instance) GetUrl() string {
-	return i.Port + ":" + strconv.Itoa(i.Port)
+	return i.Port + ":" + strconv.FormatInt(i.Port, 10)
 }
