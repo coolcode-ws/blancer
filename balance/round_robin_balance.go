@@ -1,7 +1,10 @@
 package balance
 
-import "errors"
+import (
+	"fmt"
+)
 
+//RoundRobinf负载均衡
 type RoundRobinBalance struct {
 	curIndex int
 }
@@ -9,17 +12,21 @@ type RoundRobinBalance struct {
 func init() {
 	RegisterBalancer("roundrobin", &RoundRobinBalance{})
 }
-func (p *RoundRobinBalance) DoBalance(insts []*Instance, key ...string) (inst *Instance, err error) {
+
+func (p *RoundRobinBalance) DoBalance(insts []*Instance, key ...string) (*Instance, error) {
 	lens := len(insts)
 	if lens == 0 {
-		err = errors.New("No Instance")
-		return
+		return nil, fmt.Errorf("No Instance found")
 	}
+
 	if p.curIndex >= lens {
 		p.curIndex = 0
 	}
-	inst = insts[p.curIndex]
-	//p.curIndex++
+	inst := insts[p.curIndex]
+
 	p.curIndex = (p.curIndex + 1) % lens
-	return
+
+	inst.CallTimes++
+
+	return inst, nil
 }
