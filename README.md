@@ -1,5 +1,5 @@
 # blancer
-go 负载均衡器,支持一下集中算法：
+go 负载均衡器,支持一下几种算法：
 1. 随机算法
 2. RoundRobin算法
 3. 带权重RoundRobin算法
