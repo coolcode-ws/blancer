@@ -7,6 +7,7 @@ type Instance struct {
 	Port      int64
 	Weight    int64
 	CallTimes int64
+	Type      string
 }
 
 func NewInstance(host string, port int64, wc int64) *Instance {
@@ -31,5 +32,5 @@ func (i *Instance) GetCallTimes() int64 {
 }
 
 func (i *Instance) GetResult() string {
-	return i.Host + ":" + strconv.FormatInt(i.Port, 10) + ";" + strconv.FormatInt(i.Weight, 10) + ";" + strconv.FormatInt(i.CallTimes, 10)
+	return i.Host + ":" + strconv.FormatInt(i.Port, 10) + ";call times: " + strconv.FormatInt(i.CallTimes, 10)
 }

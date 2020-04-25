@@ -4,34 +4,40 @@ import (
 	"balancer/balance"
 	"fmt"
 	"math/rand"
-	"os"
+	"time"
 )
 
 func main() {
-
 	var insts []*balance.Instance
+	rand.Seed(time.Now().UnixNano())
 	for i := 0; i < 5; i++ {
-		host := fmt.Sprintf("192.168.%d.%d", rand.Intn(255), rand.Intn(255))
+		host := fmt.Sprintf("192.168.%d.%d", rand.Intn(255), i)
 		wc := rand.Intn(10)
 		one := balance.NewInstance(host, 8080, int64(wc))
 		insts = append(insts, one)
 	}
 
-	var BalancerName = "weight_roundrobin"
-	if len(os.Args) > 1 {
-		BalancerName = os.Args[1]
-	}
+	var balanceNames = []string{"hash", "random", "roundrobin", "weight_roundrobin", "shuffle", "shuffle2"}
 
-	for i := 0; i < 10000; i++ {
-		_, err := balance.DoBalance(BalancerName, insts)
-		if err != nil {
-			fmt.Println("Do balance err:", err)
-			continue
+	for _, name := range balanceNames {
+		startTime := time.Now().UnixNano()
+		for i := 0; i < 10000; i++ {
+			_, err := balance.DoBalance(name, insts)
+			if err != nil {
+				fmt.Println("Do balance err:", err)
+				continue
+			}
 		}
-	}
-
-	for _, inst := range insts {
-		fmt.Println(inst.GetResult())
+		endTime := time.Now().UnixNano()
+		fmt.Println("name: ", name, "cost time: ", (endTime-startTime)/1000)
+		for _, inst := range insts {
+			if name == "weight_roundrobin" {
+				fmt.Println(inst.GetResult(), ";weight: ", inst.Weight)
+			} else {
+				fmt.Println(inst.GetResult())
+			}
+			inst.CallTimes = 0
+		}
 	}
 
 }
